@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">My Store App</string>
+
+    <string name="name">ชื่อ</string>
+    <string name="surname">นามสกุล</string>
+
 </resources>
