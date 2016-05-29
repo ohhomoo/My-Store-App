@@ -1,12 +1,15 @@
 package com.myezgenius.mystoreapp;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -20,11 +23,18 @@ public class MainActivity extends AppCompatActivity {
     //Explicit
     private MyManage myManage;
     private static final String urlJSON = "http://swiftcodingthai.com/Moo/get_user_moo.php";
+    private EditText userEditText, passwordEditText;
+    private String userString, passwordString;
+    private String[] loginStrings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Bind Widget
+        userEditText = (EditText) findViewById(R.id.editText5);
+        passwordEditText = (EditText) findViewById(R.id.editText6);
 
         myManage = new MyManage(this);
 
@@ -35,6 +45,64 @@ public class MainActivity extends AppCompatActivity {
         synMySQLtoSQLite();
 
     }   // Main Method
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        deleteAllSQLite();
+        synMySQLtoSQLite();
+    }
+
+    public void clickSignIn(View view) {
+
+        userString = userEditText.getText().toString().trim();
+        passwordString = passwordEditText.getText().toString().trim();
+
+        if (userString.equals("")||passwordString.equals("")) {
+            Toast.makeText(this, "กรุณากรอกทุกช่องคะ", Toast.LENGTH_SHORT).show();
+
+        } else {
+            checkUserAnPass();
+        }
+
+    }   //clickSignIn
+
+    private void checkUserAnPass() {
+
+        try {
+
+            SQLiteDatabase sqLiteDatabase = openOrCreateDatabase(MyOpenHelper.database_name,
+                    MODE_PRIVATE, null);
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM userTABLE WHERE User = " + "'" + userString + "'", null);
+            cursor.moveToFirst();
+
+            loginStrings = new String[cursor.getColumnCount()];
+            for (int i=0;i<cursor.getColumnCount();i++){
+
+                loginStrings[i] = cursor.getString(i);
+
+            }   //for
+            cursor.close();
+
+            //Check Password
+            if (passwordString.equals(loginStrings[4])) {
+                //Password True
+                Toast.makeText(this,"ยินดีต้อนรับ "+ loginStrings[1]+"" + loginStrings[2],
+                        Toast.LENGTH_SHORT).show();
+
+            } else {
+                //Password False
+                Toast.makeText(this, "กรุณาพิมพ์ Password ใหม่ Password ผิด",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (Exception e) {
+
+            Toast.makeText(this,"ไม่มี"+userString+"ในฐานข้อมูลของเรา",
+                    Toast.LENGTH_SHORT).show();
+        }
+
+    }   //checkUserAnPass
 
     // Create Inner Class
     public class ConnectedUserJSON extends AsyncTask<Void, Void, String> {

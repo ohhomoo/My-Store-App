@@ -1,7 +1,10 @@
 package com.myezgenius.mystoreapp;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -49,13 +52,37 @@ public class SignUpActivity extends AppCompatActivity {
         if (checkSpace()) {
             //Have Space
             Toast.makeText(this, "กรุณากรอกให้ครบ ทุกช่องคะ", Toast.LENGTH_SHORT).show();
+        } else if (checkUser()) {
+            Toast.makeText(this, "เปลี่ยน User ใหม่ User นี้มีแล้ว", Toast.LENGTH_SHORT).show();
+
         } else {
-            //No Space
             uploadNewUser();
         }
 
 
+
+
     }   // clickSign
+
+    private boolean checkUser() {
+
+        try {
+
+            SQLiteDatabase sqLiteDatabase = openOrCreateDatabase(MyOpenHelper.database_name,
+                    MODE_PRIVATE, null);
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM userTABLE WHERE User = " + "'" + userString + "'", null);
+            cursor.moveToFirst();
+
+            Log.d("Store", "userString ==> " + cursor.getString(3) + " มีแล้ว");
+
+            return true;
+
+        } catch (Exception e) {
+
+            return false;
+
+        }
+    }
 
     private void uploadNewUser() {
 
