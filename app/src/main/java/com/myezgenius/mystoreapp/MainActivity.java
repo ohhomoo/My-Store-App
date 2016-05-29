@@ -87,6 +87,12 @@ public class MainActivity extends AppCompatActivity {
             //Check Password
             if (passwordString.equals(loginStrings[4])) {
                 //Password True
+
+                Intent intent = new Intent(MainActivity.this, StoreActivity.class);
+                intent.putExtra("Login", loginStrings);
+                startActivity(intent);
+                finish();
+
                 Toast.makeText(this,"ยินดีต้อนรับ "+ loginStrings[1]+"" + loginStrings[2],
                         Toast.LENGTH_SHORT).show();
 
